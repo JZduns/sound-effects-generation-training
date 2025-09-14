@@ -255,6 +255,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
     metric["gradient"] = avg_loss
     metric["time"] = time() - start1
     metric()
+    logging.info(f"epoch: {metric["epoch"]}, loss: {metric["loss"]}, time: {metric["time"]}")
 
 
 def validate(model, criterion, data_loader, device, epoch):
@@ -353,7 +354,6 @@ def main(args):
         "n_hidden": args.n_hidden_melresnet,
         "n_output": args.n_output_melresnet
     }
-    print(f"{params=}")
     params = json.dumps(params, indent=4)    
     with open("waveRNN_model_params.json", "w") as f:
         f.write(params)
@@ -442,7 +442,7 @@ def main(args):
             train_loader,
             devices[0],
             epoch,
-        )
+        )        
 
         if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
 
