@@ -430,6 +430,13 @@ def main(args):
             args.checkpoint,
         )
 
+    # usunięcie starych logów
+    logs_file = "metrics_logs.txt"
+    if os.path.isfile(logs_file):
+        logging.info("Clearing old logs")
+        with open(logs_file, "r+") as f:
+            f.seek(0)
+            f.truncate()
 
     model = torch.nn.DataParallel(model)
     model = model.to(devices[0], non_blocking=True)
