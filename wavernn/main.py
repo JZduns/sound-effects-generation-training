@@ -465,8 +465,8 @@ def main(args):
                     "best_loss": best_loss,
                     "optimizer": optimizer.state_dict(),
                 },
-                is_best,
-                args.checkpoint+"_new",
+                is_best,                
+                args.checkpoint
             )
 
     logging.info(f"End time: {datetime.now()}")

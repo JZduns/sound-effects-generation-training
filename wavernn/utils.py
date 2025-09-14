@@ -49,6 +49,7 @@ def save_checkpoint(state, is_best, filename):
 
     torch.save(state, tempfile)
     if os.path.isfile(tempfile):
+        os.remove(filename)
         os.rename(tempfile, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar") # nie zapisuje modelu tylko state dict
