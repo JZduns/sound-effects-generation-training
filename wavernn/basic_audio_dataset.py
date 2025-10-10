@@ -45,7 +45,8 @@ class BasicAudioDataset(Dataset):
         return (
             waveform,
             sample_rate,
-            label
+            label,
+            fileid
         )
 
 
