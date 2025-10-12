@@ -21,7 +21,7 @@ class BasicAudioDataset(Dataset):
         root = Path(root)
 
         self._path = root
-        self._metadata_path = root / "metadata.csv"
+        self._metadata_path = os.path.join(root, "metadata.csv")
 
         if not os.path.exists(self._path):
             raise RuntimeError(
@@ -41,7 +41,8 @@ class BasicAudioDataset(Dataset):
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         line = self._flist[n]
         fileid, label, file_path = line
-        fileid_audio = self._path / file_path
+        file_path = file_path.replace("\\", "/")
+        fileid_audio = os.path.join(self._path, file_path)
 
         # Load audio
         if not os.path.isfile(fileid_audio):
