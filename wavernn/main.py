@@ -248,14 +248,15 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
         sums["iteration"] += 1
 
     avg_loss = sums["loss"] / len(data_loader)
+    epoch_time = time() - start1
 
     metric = MetricLogger("train_epoch")
     metric["epoch"] = epoch
     metric["loss"] = sums["loss"] / len(data_loader)
     metric["gradient"] = avg_loss
-    metric["time"] = time() - start1
+    metric["time"] = epoch_time
     metric()
-    logging.info(f"epoch: {epoch}, loss: {avg_loss}")
+    logging.info(f"epoch: {epoch}, loss: {avg_loss}, time: {epoch_time}")
     
 
 
