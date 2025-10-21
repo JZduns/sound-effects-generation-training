@@ -120,17 +120,11 @@ def main(args):
 
     data_loader = DataLoader(dataset, shuffle=True)
 
-    """
-    [tensor([[[ 0.0092,  0.0043, -0.0071,  ..., -0.0362, -0.0141,  0.0027]]]), tensor([22050]), ('air_conditioner',), ('167464-0-0-2',)]
-    firstel[0].shape=torch.Size([1, 1, 88200])
-    types: [<class 'torch.Tensor'>, <class 'torch.Tensor'>, <class 'tuple'>, <class 'tuple'>]
-    """
-
     for waveform, sample_rate, label, fileid in data_loader:
         
         mel_specgram = transforms(waveform.squeeze(0))
 
-        t0 = time()
+        if args.single: t0 = time()
 
         with torch.no_grad():
             output = wavernn_inference_model(
@@ -147,8 +141,7 @@ def main(args):
         torchaudio.save(save_path, output, sample_rate=sample_rate.item())
         
         if args.single:
-            print(f"generation took {time()-t0} s")
-            print(f"generated file saved in {save_path}")            
+            print(f"generation took {time()-t0} s, file saved in {save_path}")            
             break
 
 
