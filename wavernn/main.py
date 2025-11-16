@@ -12,7 +12,7 @@ import torchaudio
 from datasets import collate_factory, split_process_dataset
 from losses import LongCrossEntropyLoss, MoLLoss
 from processing import NormalizeDB
-from torch.optim import Adam
+from torch.optim import Adam, lr_scheduler
 from torch.utils.data import DataLoader
 from torchaudio.models.wavernn import WaveRNN
 from utils import count_parameters, MetricLogger, save_checkpoint
@@ -260,7 +260,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
     
 
 
-def validate(model, criterion, data_loader, device, epoch):
+def validate(model, criterion, data_loader, device, epoch, scheduler):
 
     with torch.no_grad():
 
@@ -281,10 +281,12 @@ def validate(model, criterion, data_loader, device, epoch):
             sums["loss"] += loss.item()
 
         avg_loss = sums["loss"] / len(data_loader)
+        scheduler.step(avg_loss)
 
         metric = MetricLogger("validation")
         metric["epoch"] = epoch
         metric["loss"] = avg_loss
+        metric["Learning Rate"] = scheduler.get_last_lr()[0]
         metric["time"] = time() - start
         metric()
 
@@ -396,6 +398,8 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
+    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=5)
+
     criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
     best_loss = 10.0
@@ -453,9 +457,9 @@ def main(args):
             epoch,
         )        
 
-        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
+        sum_loss = validate(model, criterion, val_loader, devices[0], epoch, scheduler)
 
-            sum_loss = validate(model, criterion, val_loader, devices[0], epoch)
+        if not (epoch + 1) % args.print_freq or epoch == args.epochs - 1:
 
             is_best = sum_loss < best_loss
             best_loss = min(sum_loss, best_loss)
