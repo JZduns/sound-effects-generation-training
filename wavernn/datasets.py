@@ -45,7 +45,7 @@ class Processed(torch.utils.data.Dataset):
         return item[0].squeeze(0), specgram
 
 
-def split_process_dataset(args, transforms):
+def split_process_dataset(args, train_transforms, val_transforms):
     if args.dataset == "ljspeech":
         data = LJSPEECH(root=args.file_path, download=False)
 
@@ -67,8 +67,8 @@ def split_process_dataset(args, transforms):
     else:
         raise ValueError(f"Expected dataset: `ljspeech`, `libritts` or `basicaudiodataset`, but found {args.dataset}")
 
-    train_dataset = Processed(train_dataset, transforms)
-    val_dataset = Processed(val_dataset, transforms)
+    train_dataset = Processed(train_dataset, train_transforms)
+    val_dataset = Processed(val_dataset, val_transforms)
 
     train_dataset = MapMemoryCache(train_dataset)
     val_dataset = MapMemoryCache(val_dataset)

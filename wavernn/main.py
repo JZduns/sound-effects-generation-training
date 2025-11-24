@@ -16,6 +16,8 @@ from torch.optim import Adam, lr_scheduler
 from torch.utils.data import DataLoader
 from torchaudio.models.wavernn import WaveRNN
 from utils import count_parameters, MetricLogger, save_checkpoint
+from audiomentations_wrapper import AudiomentationsWrapper
+from audiomentations import PitchShift
 
 
 def arg_parser():
@@ -317,8 +319,9 @@ def main(args):
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
     )
+    train_augmentations = PitchShift(min_semitones=-2, max_semitones=2, p=0.5)
 
-    train_dataset, val_dataset = split_process_dataset(args, transforms)
+    train_dataset, val_dataset = split_process_dataset(args, torch.nn.Sequential(AudiomentationsWrapper(train_augmentations, args.sample_rate), transforms), transforms)
 
     loader_training_params = {
         "num_workers": args.workers,
@@ -398,7 +401,7 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=5)
+    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=8)
 
     criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
