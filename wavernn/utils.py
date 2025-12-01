@@ -52,6 +52,7 @@ def save_checkpoint(state, is_best, filename):
         if os.path.isfile(filename): os.remove(filename)
         os.rename(tempfile, filename)
     if is_best:
+        logging.info("Checkpoint: updating model_best")
         shutil.copyfile(filename, "model_best.pth.tar") # nie zapisuje modelu tylko state dict
     logging.info("Checkpoint: saved")
 
