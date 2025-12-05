@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 from torchaudio.models.wavernn import WaveRNN
 from utils import count_parameters, MetricLogger, save_checkpoint
 from audiomentations_wrapper import AudiomentationsWrapper
-from audiomentations import Compose, PitchShift, Gain
+from audiomentations import Compose, PitchShift, Gain, AddColorNoise
 
 
 def arg_parser():
@@ -320,7 +320,9 @@ def main(args):
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
     )
     train_augmentations = Compose([PitchShift(min_semitones=-2, max_semitones=2), 
-                                   Gain(min_gain_db=-3, max_gain_db=3)])
+                                   Gain(min_gain_db=-3, max_gain_db=3),
+                                   AddColorNoise(min_snr_db=10, max_snr_db=20, min_f_decay=0, max_f_decay=0)
+                                   ])
 
     train_dataset, val_dataset = split_process_dataset(args, torch.nn.Sequential(AudiomentationsWrapper(train_augmentations, args.sample_rate), transforms), transforms)
 
