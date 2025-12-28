@@ -60,6 +60,7 @@ def parse_args():
     parser.add_argument(
         "--single",
         default=False,
+        action="store_true",
         help="Use single file from dataset"
     )
     args = parser.parse_args()
