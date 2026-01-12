@@ -403,7 +403,8 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=8)
+    # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=8)
+    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=3e-5)
 
     criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
