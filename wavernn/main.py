@@ -283,7 +283,8 @@ def validate(model, criterion, data_loader, device, epoch, scheduler):
             sums["loss"] += loss.item()
 
         avg_loss = sums["loss"] / len(data_loader)
-        scheduler.step(avg_loss)
+        # scheduler.step(avg_loss) # ReduceLROnPlateau
+        scheduler.step() # CosineAnnealingLR
 
         metric = MetricLogger("validation")
         metric["epoch"] = epoch
@@ -404,7 +405,7 @@ def main(args):
     optimizer = Adam(model.parameters(), **optimizer_params)
 
     # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=8)
-    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=3e-5)
+    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-5)
 
     criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
