@@ -242,6 +242,7 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
             sums["gradient"] += gradient.item()
             metric["gradient"] = gradient.item()
 
+        # scheduler.step(avg_loss) # ReduceLROnPlateau
         optimizer.step()
 
         metric["iteration"] = sums["iteration"]
@@ -405,7 +406,9 @@ def main(args):
     optimizer = Adam(model.parameters(), **optimizer_params)
 
     # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=8)
-    scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-5)
+    # scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-5)
+    scheduler = lr_scheduler.OneCycleLR(optimizer, max_lr=args.learning_rate, 
+                                        steps_per_epoch=len(train_loader), epochs=args.epochs)
 
     criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
