@@ -208,7 +208,7 @@ def arg_parser():
     return parser
 
 
-def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
+def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, scheduler=None):
 
     model.train()
 
@@ -242,8 +242,8 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch):
             sums["gradient"] += gradient.item()
             metric["gradient"] = gradient.item()
 
-        # scheduler.step(avg_loss) # ReduceLROnPlateau
         optimizer.step()
+        scheduler.step() # OneCycleLR
 
         metric["iteration"] = sums["iteration"]
         metric["time"] = time() - start2
@@ -285,7 +285,7 @@ def validate(model, criterion, data_loader, device, epoch, scheduler):
 
         avg_loss = sums["loss"] / len(data_loader)
         # scheduler.step(avg_loss) # ReduceLROnPlateau
-        scheduler.step() # CosineAnnealingLR
+        # scheduler.step() # CosineAnnealingLR
 
         metric = MetricLogger("validation")
         metric["epoch"] = epoch
@@ -465,6 +465,7 @@ def main(args):
             train_loader,
             devices[0],
             epoch,
+            scheduler
         )        
 
         sum_loss = validate(model, criterion, val_loader, devices[0], epoch, scheduler)
