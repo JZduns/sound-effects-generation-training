@@ -203,8 +203,13 @@ def arg_parser():
         metavar="PATH",
         help="path to state_dict",
     )
-
-    
+    parser.add_argument(
+        "--scheduler",
+        default="ReduceLROnPlateau",
+        choices=["ReduceLROnPlateau", "CosineAnnealingLR", "OneCycleLR"],
+        type=str,
+        help="the type of scheduler",
+    )
     return parser
 
 
@@ -243,7 +248,8 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, sch
             metric["gradient"] = gradient.item()
 
         optimizer.step()
-        scheduler.step() # OneCycleLR
+        if args.scheduler == "OneCycleLR":
+            scheduler.step()
 
         metric["iteration"] = sums["iteration"]
         metric["time"] = time() - start2
@@ -284,8 +290,11 @@ def validate(model, criterion, data_loader, device, epoch, scheduler):
             sums["loss"] += loss.item()
 
         avg_loss = sums["loss"] / len(data_loader)
-        # scheduler.step(avg_loss) # ReduceLROnPlateau
-        # scheduler.step() # CosineAnnealingLR
+
+        if args.scheduler == "ReduceLROnPlateau":
+            scheduler.step(avg_loss)
+        elif args.scheduler == "CosineAnnealingLR":
+            scheduler.step()
 
         metric = MetricLogger("validation")
         metric["epoch"] = epoch
@@ -405,10 +414,13 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
-    # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=8)
-    # scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-5)
-    scheduler = lr_scheduler.OneCycleLR(optimizer, max_lr=args.learning_rate, 
-                                        steps_per_epoch=len(train_loader), epochs=args.epochs)
+    if args.scheduler == "ReduceLROnPlateau":
+        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=5)
+    elif args.scheduler == "CosineAnnealingLR":
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-5)
+    elif args.scheduler == "OneCycleLR":
+        scheduler = lr_scheduler.OneCycleLR(optimizer, max_lr=args.learning_rate, 
+                                            steps_per_epoch=len(train_loader), epochs=args.epochs)
 
     criterion = LongCrossEntropyLoss() if args.loss == "crossentropy" else MoLLoss()
 
