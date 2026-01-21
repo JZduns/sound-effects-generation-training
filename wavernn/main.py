@@ -417,7 +417,7 @@ def main(args):
     if args.scheduler == "ReduceLROnPlateau":
         scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=5)
     elif args.scheduler == "CosineAnnealingLR":
-        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-5)
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-5)
     elif args.scheduler == "OneCycleLR":
         scheduler = lr_scheduler.OneCycleLR(optimizer, max_lr=args.learning_rate, 
                                             steps_per_epoch=len(train_loader), epochs=args.epochs)
