@@ -32,7 +32,7 @@ class MetricLogger:
                 print(self, flush=True, file=f) 
 
 
-def save_checkpoint(state, is_best, filename):
+def save_checkpoint(state, is_best, filename, epoch=0):
     r"""Save the model to a temporary file first,
     then copy it to filename, in case the signal interrupts
     the torch.save() process.
@@ -53,7 +53,8 @@ def save_checkpoint(state, is_best, filename):
         os.rename(tempfile, filename)
     if is_best:
         logging.info("Checkpoint: updating model_best")
-        shutil.copyfile(filename, "model_best.pth.tar") # nie zapisuje modelu tylko state dict
+        os.makedirs("model_best", exist_ok=True)
+        shutil.copyfile(filename, f"model_best/model_best_e{epoch}.pth.tar") # nie zapisuje modelu tylko state dict
     logging.info("Checkpoint: saved")
 
 

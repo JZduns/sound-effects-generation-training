@@ -493,8 +493,9 @@ def main(args):
                     "best_loss": best_loss,
                     "optimizer": optimizer.state_dict(),
                 },
-                is_best,                
-                args.checkpoint
+                is_best,
+                args.checkpoint,
+                epoch+1
             )
 
     logging.info(f"End time: {datetime.now()}")
