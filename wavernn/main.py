@@ -210,6 +210,12 @@ def arg_parser():
         type=str,
         help="the type of scheduler",
     )
+    parser.add_argument(
+        "--freeze-layers",
+        default=False,
+        action="store_true",
+        help="freeze layers for fine-tuning",
+    )
     return parser
 
 
@@ -394,6 +400,12 @@ def main(args):
 
     if args.jit:
         model = torch.jit.script(model)
+
+    if args.freeze_layers:
+        logging.info("Freezing layers")
+        # wszystkie warstwy
+        for param in model.parameters():
+            param.requires_grad = False
 
     
 
