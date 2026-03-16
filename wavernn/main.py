@@ -403,10 +403,11 @@ def main(args):
 
     if args.freeze_layers:
         logging.info("Freezing layers")
-        # wszystkie warstwy
-        for param in model.parameters():
-            param.requires_grad = False
-
+        # końcowe warstwy
+        for name, layer in model.named_children():
+            if name not in ["fc1", "fc2", "fc3"]:
+                for param in layer.parameters():
+                    param.requires_grad = False
     
 
     n = count_parameters(model)
