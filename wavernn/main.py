@@ -205,7 +205,7 @@ def arg_parser():
     )
     parser.add_argument(
         "--scheduler",
-        default="ReduceLROnPlateau",
+        default=None,
         choices=["ReduceLROnPlateau", "CosineAnnealingLR", "OneCycleLR"],
         type=str,
         help="the type of scheduler",
@@ -215,6 +215,12 @@ def arg_parser():
         default=False,
         action="store_true",
         help="freeze layers for fine-tuning",
+    )
+    parser.add_argument(
+        "--augmentations",
+        default=False,
+        action="store_true",
+        help="enable augmentations",
     )
     return parser
 
@@ -305,7 +311,8 @@ def validate(model, criterion, data_loader, device, epoch, scheduler):
         metric = MetricLogger("validation")
         metric["epoch"] = epoch
         metric["loss"] = avg_loss
-        metric["Learning Rate"] = scheduler.get_last_lr()[0]
+        if scheduler:
+            metric["Learning Rate"] = scheduler.get_last_lr()[0]
         metric["time"] = time() - start
         metric()
 
@@ -336,11 +343,13 @@ def main(args):
         ),
         NormalizeDB(min_level_db=args.min_level_db, normalization=args.normalization),
     )
-    train_augmentations = Compose([PitchShift(min_semitones=-2, max_semitones=2),
-                                   Gain(min_gain_db=-3, max_gain_db=3)
-                                   ])
-
-    train_dataset, val_dataset = split_process_dataset(args, torch.nn.Sequential(AudiomentationsWrapper(train_augmentations, args.sample_rate), transforms), transforms)
+    if args.augmentations:
+        train_augmentations = Compose([PitchShift(min_semitones=-2, max_semitones=2),
+                                       Gain(min_gain_db=-3, max_gain_db=3)
+                                       ])
+        train_dataset, val_dataset = split_process_dataset(args, torch.nn.Sequential(AudiomentationsWrapper(train_augmentations, args.sample_rate), transforms), transforms)
+    else:
+        train_dataset, val_dataset = split_process_dataset(args, transforms, transforms)
 
     loader_training_params = {
         "num_workers": args.workers,
@@ -427,8 +436,9 @@ def main(args):
 
     optimizer = Adam(model.parameters(), **optimizer_params)
 
+    scheduler = None
     if args.scheduler == "ReduceLROnPlateau":
-        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=5)
+        scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=2, threshold=0.01)
     elif args.scheduler == "CosineAnnealingLR":
         scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-5)
     elif args.scheduler == "OneCycleLR":
