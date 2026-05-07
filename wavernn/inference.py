@@ -125,7 +125,7 @@ def main(args):
         
         mel_specgram = transforms(waveform.squeeze(0))
 
-        if args.single: t0 = time()
+        t0 = time()
 
         with torch.no_grad():
             output = wavernn_inference_model(
@@ -140,9 +140,9 @@ def main(args):
         os.makedirs(save_path, exist_ok=True)
         save_path = os.path.join(save_path, fileid[0] + ".wav")
         torchaudio.save(save_path, output, sample_rate=sample_rate.item())
+        print(f"generation took {time()-t0} s, file saved in {save_path}")  
         
-        if args.single:
-            print(f"generation took {time()-t0} s, file saved in {save_path}")            
+        if args.single:         
             break
 
 
