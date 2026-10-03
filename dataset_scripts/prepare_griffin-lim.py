@@ -1,5 +1,6 @@
 """
-Skrypt tworzy mel-spektrogramy z danych testowych, a następnie zapisuje pliki z audio odtworzonym przy pomocy algorytmu Griffin-Lim
+Skrypt tworzy mel-spektrogramy z danych testowych, a następnie zapisuje pliki z audio odtworzonym przy pomocy algorytmu Griffin-Lim.
+Pliki zapisywane są wewnątrz folderu z datasetem w folderze griffin-lim/.
 """
 
 import os, librosa, argparse

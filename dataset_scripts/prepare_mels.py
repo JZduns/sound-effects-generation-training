@@ -1,6 +1,7 @@
 """
-Skrypt zapisuje dane treningowe/testowe w formie mel-spektrogramów
-oraz zapisuje metadane dla HiFi-GAN w pliku mels_metadata.tsv
+Skrypt zapisuje dane treningowe/testowe w formie mel-spektrogramów,
+oraz zapisuje metadane dla HiFi-GAN w pliku mels_metadata.tsv.
+Pliki .npy (treningowe) / .pt (testowe) zapisywane są wewnątrz folderu z datasetem w folderze mels/.
 """
 
 import os, librosa, argparse, torch

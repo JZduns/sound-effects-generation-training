@@ -1,5 +1,5 @@
 """
-Skrypt resampluje pliki do wymaganego SR, zapisuje w nowym folderze i tworzy plik batch_input.csv do użycia jako input dla VISQOL
+Skrypt resampluje pliki do wymaganego SR, zapisuje w nowym folderze i tworzy plik batch_input.csv do użycia jako input dla VISQOL.
 """
 
 import os, librosa, csv, argparse

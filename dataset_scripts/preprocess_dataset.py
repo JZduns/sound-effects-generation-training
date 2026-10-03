@@ -1,6 +1,6 @@
 """
 Skrypt dzieli dataset ESC-50 na foldery train i test z plikami przetworzonymi tak jak w datasecie ljspeech
-oraz tworzy pliki z metadanymi: metadata.csv dla WaveRNN i filelist_train/val.txt dla HiFi-GAN
+oraz tworzy pliki z metadanymi: metadata.csv dla WaveRNN i filelist_train/val.txt dla HiFi-GAN.
 """
 
 import os, copy, csv, argparse, librosa
