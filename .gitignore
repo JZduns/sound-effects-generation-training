@@ -1,5 +1,11 @@
 checkpoints/
 dataset/
 output/
+weights/
 *.pyc
 .vscode
+frechet_test/
+visqol_text/
+local/
+__pycache__/
+.venv/

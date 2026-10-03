@@ -1,0 +1,28 @@
+# pytorch
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0
+torchaudio==2.11.0 # wymaga ffmpeg (shared build)
+torchcodec
+
+# przetwarzanie danych/ogólne
+pandas
+soundfile
+numpy==1.26.4
+librosa
+matplotlib
+ipykernel
+
+# wavernn
+audiomentations
+
+# HiFi-GAN, trening wymaga dodatkowo pobrania Nvidia Apex (https://github.com/nvidia/apex)
+inflect
+pynvml==11.0.0
+scipy
+tensorboardX==2.0
+tensorboard
+git+https://github.com/NVIDIA/dllogger@v1.0.0#egg=dllogger
+
+# metryki
+zimtohrli
+frechet_audio_distance
